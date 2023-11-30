@@ -1,9 +1,14 @@
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
 from enemies import Enemies 
 from support import import_folder
 import pygame
 import random 
+from settings import *
 
-class Necromancer(Enemies):
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
+class Necroboss(Enemies):     
     def __init__(self, pos):  # Este é o método construtor da classe Enemies, que é chamado automaticamente quando uma nova instância (objeto) da classe é criada. 
                               # Ele recebe um parâmetro pos, que representa a posição inicial do inimigo.
         #Setup do inimigo.
@@ -17,6 +22,7 @@ class Necromancer(Enemies):
         self.skullmovel = 25
         self.skullmover = 25
         self.random_value = random.randint(1, 50)
+        self.timetoattack = False
 
 #------------------------------------------------------#
 
@@ -72,7 +78,7 @@ class Necromancer(Enemies):
         if self.facing_right:                                                        # Se o inimigo estiver olhando para a direita...           
              self.image = pygame.transform.scale(image, (int(image.get_width() * self.scale_factor), int(image.get_height() * self.scale_factor)))   
         else:                                                                        # Se o inimigo estiver olhando para a esquerda...
-            flipped_image = pygame.transform.flip(image, True, False) # flipped_image recebe a imagem invertida do lado horizontal. 
+            flipped_image = pygame.transform.flip(image, True, False)                # flipped_image recebe a imagem invertida do lado horizontal. 
             self.image = pygame.transform.scale(flipped_image, (int(flipped_image.get_width() * self.scale_factor), int(flipped_image.get_height() * self.scale_factor)))  # self.image recebe a variável com a imagem flipada e escalada.
 
             # Uma nova variável é criada e recebe o método flip do pygame... 
@@ -80,7 +86,27 @@ class Necromancer(Enemies):
             # Enquanto o False é referente ao Y... 
             # Significando que ele apenas vai virar da esquerda para direita.
 
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
+    def special_moves(self):
+
+        def teleport():
+            timetoattack = False
+            new_x = random.randint(0, screen_width - self.rect.width)  
+            new_y = random.randint(0, screen_height - self.rect.height)
+            self.rect.topleft = (new_x, new_y)
+
+        if self.random_value > 5:
+            for _ in range(5):
+                teleport()
+        
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
     def update(self):                                  # Este método é responsável por atualizar o inimigo nos eventos.
 
         self.animate()                                 # Chama o Método animate da própria Classe.
         self.get_status()                              # Chama o Método get_status da própria Classe.
+        # Desenhe o retângulo na tela
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
