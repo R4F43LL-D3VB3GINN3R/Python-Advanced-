@@ -116,6 +116,9 @@ class Level:
 
     def horizontal_movement_collision(self): # Método responsável por lidar com o movimento horizontal do jogador e verificar colisões horizontais.
 
+        print(self.health)
+        print(self.healthboss)
+
         player = self.player.sprite                          # player recebe o sprite do Jogador. 
         player.rect.x += player.direction.x * player.speed   # Atualiza a posicão horizontal do jogador incrementando-a. 
                                                              # Multiplicá-lo por qualquer número aumenta a velocidade. 
@@ -177,7 +180,7 @@ class Level:
                     self.current_x = player.rect.left  # A posição atual do jogador em x é atualizada para a borda esquerda do retângulo do jogador.
                     if player.blow == True:  # Se o jogador estiver golpeando...
                         necroboss.special_moves()
-                        self.healthboss -= 1  # Remove o chefe do grupo de sprites.
+                        self.healthboss -= 20  # Remove o chefe do grupo de sprites.
                         player.blow = False  # Redefine a flag de ataque.
                     else:  # Se o jogador não estiver golpeando...
                         player.status = 'hurt'  # O jogador recebe o status de machucado.
@@ -188,7 +191,7 @@ class Level:
                     self.current_x = player.rect.right  # A posição atual do jogador em x é atualizada para a borda direita do retângulo do jogador.
                     if player.blow == True:  # Se o jogador estiver golpeando...
                         necroboss.special_moves()
-                        self.healthboss -= 1  # Remove o chefe do grupo de sprites.
+                        self.healthboss -= 20  # Remove o chefe do grupo de sprites.
                         player.blow = False  # Redefine a flag de ataque.
                     else:  # Se o jogador não estiver golpeando...
                         player.status = 'hurt'  # O jogador recebe o status de machucado.
@@ -278,16 +281,26 @@ class Level:
             player.on_ceiling = False                                             # O jogador não está tocando no teto.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
     def blastattack(self, screen):
 
         self.attack_rect.x -= self.splashspeed
-        self.attack_rect2.x -= self.splashspeed
+        self.attack_rect2.x -= self.splashspeed 
+        self.attack_rect3.x -= self.splashspeed 
+
+        pygame.draw.rect(screen, (255, 255, 255), self.attack_rect3)
+
+        if self.healthboss < 99:
+            if self.attack_rect3.x < 0:
+                self.attack_rect3.x = 1200  
+                self.attack_rect3.y = random.randint(1, 604)
+                pygame.draw.rect(self.display_surface, (255, 255, 0), self.attack_rect3)
 
         pygame.draw.rect(screen, (255, 255, 0), self.attack_rect2)
 
         print(self.healthboss)
 
-        if self.healthboss <= 99:
+        if self.healthboss < 99:
             if self.attack_rect2.x < 0:
                 self.attack_rect2.x = 1200  
                 self.attack_rect2.y = random.randint(1, 604)
@@ -361,5 +374,6 @@ class Level:
 
         self.horizontal_movement_collision()     # Usa o método horizontal_movement_collision para verificar colisões horizontais.
         self.vertical_movement_collision()       # Usa o método horizontal_movement_collision para verificar colisões verticais.
+        self.blastattack(self.display_surface)
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
