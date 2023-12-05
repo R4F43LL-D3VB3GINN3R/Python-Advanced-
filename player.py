@@ -2,6 +2,7 @@
 
 import pygame 
 from support import import_folder
+from necroboss import Necroboss
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 # Classe 'Player' herda pygame.sprite.Sprite...                                                                          
@@ -9,7 +10,7 @@ from support import import_folder
 # A Classe Player representa um jogador no seu jogo.                                                                     
 # Ele possui uma representação visual (superfície) na forma de um retângulo vermelho.                                  
 # e tem um retângulo associado (self.rect) que é usado para posicionar o jogador na tela e para interações de colisão.   
-# A classe também inclui uma nova propriedade chamada 'direction', um vetor bidimensional usando pygame.math.Vector2,    
+# A classe também inclui uma nova propriedade chamada 'direction', um vetor bidimensional usando pygame.math.Vector2,     
 # que representa a direção atual do jogador no plano (x, y).
 # 
 # Além disso, foi adicionado o método 'get_input', que obtém as entradas do teclado e atualiza a direção do jogador
@@ -34,19 +35,21 @@ class Player(pygame.sprite.Sprite):
         self.animation_speed = 0.15                             # Define a velocidade em que os sprites se transformam.
         self.image = self.animations['idle'][self.frame_index]  # Define o sprite como 'Idle'. 
         self.rect = self.image.get_rect(topleft = pos)          # Obtém um retângulo associado à superfície do jogador na posicão do canto superior esquerdo.
-        self.scale_factor = 1.5                                   # AUMENTAR O TAMANHO DO SPRITE... 
+        self.scale_factor = 1.5                                 # AUMENTAR O TAMANHO DO SPRITE... 
+        pygame.mixer.init()                                     # Myxer do pygame.
+        self.jump_sfx = pygame.mixer.Sound('./graphics/sounds/scenario/jump.mp3')  # Áudio do salto.
 
 #------------------------------------------------------#
 
         #Movimentacão do Jogador. 
-        self.direction = pygame.math.Vector2(0,0)   # Cria um vetor bidimensional para representar a direção do jogador no plano (x, y)
-        self.speed = 3                              # Recebe a Velocidade do Jogador.
-        self.gravity = 0.7                          # Recebe a forca da gravidade.
-        self.jump_speed = -20                       # Recebe a velocidade do salto.
-        self.cooldown = 0                           # Recebe o cooldown do jogador após movimento. 
-        self.cooldown_attack = 0                    # Recebe o cooldown do ataque do jogador.
-        self.attack_speed = 0.42                    # Recebe a velocidade de ataque. 
-        self.blow = False                           # Recebe o ato de golpear.
+        self.direction = pygame.math.Vector2(0,0)  # Cria um vetor bidimensional para representar a direção do jogador no plano (x, y)
+        self.speed = 3                             # Recebe a Velocidade do Jogador.
+        self.gravity = 0.7                         # Recebe a forca da gravidade.
+        self.jump_speed = -20                      # Recebe a velocidade do salto.
+        self.cooldown = 0                          # Recebe o cooldown do jogador após movimento. 
+        self.cooldown_attack = 0                   # Recebe o cooldown do ataque do jogador.
+        self.attack_speed = 0.42                   # Recebe a velocidade de ataque. 
+        self.blow = False                          # Recebe o ato de golpear.
 
 #------------------------------------------------------#
 
@@ -71,7 +74,7 @@ class Player(pygame.sprite.Sprite):
 
     def import_character_assets(self): # O método import_character_assets é responsável por carregar as animações do jogador a partir de arquivos de imagem.
 
-        character_path = './graphics/character/'  # Define o caminho para a pasta que contém os recursos gráficos do personagem
+        character_path = './graphics/character/'                                               # Define o caminho para a pasta que contém os recursos gráficos do personagem
         self.animations = {'idle':[], 'run':[], 'jump':[], 'fall':[], 'attack1':[], 'hurt':[]} # Um dicionário que será preenchido com listas de imagens para diferentes animações do jogador.
 
         for animation in self.animations.keys():                  # Itera sobre as chaves do dicionário (os estados de animação).
@@ -88,9 +91,9 @@ class Player(pygame.sprite.Sprite):
 
         image = animation[int(self.frame_index)] # A variável image do jogador recebe a imagem correspondente ao índice atual da animação.
 
-        if self.facing_right:   # Se o jogador estiver olhando para a direita...           
+        if self.facing_right:                                         # Se o jogador estiver olhando para a direita...           
             self.image = pygame.transform.scale(image, (int(image.get_width() * self.scale_factor), int(image.get_height() * self.scale_factor)))
-        else:                   # Se o jogador estiver olhando para a esquerda...
+        else:                                                         # Se o jogador estiver olhando para a esquerda...
             flipped_image = pygame.transform.flip(image, True, False) # flipped_image recebe a imagem invertida do lado horizontal. 
             self.image = pygame.transform.scale(flipped_image, (int(flipped_image.get_width() * self.scale_factor), int(flipped_image.get_height() * self.scale_factor)))  # self.image recebe a variável com a imagem flipada e escalada.
 
@@ -178,9 +181,12 @@ class Player(pygame.sprite.Sprite):
         self.direction.y += self.gravity   # A coordenada y da direção do jogador recebe o incremento da forca da gravidade.
         self.rect.y += self.direction.y    # O retângulo do jogador é pressionado pelo incremento da posicão y do vetor.
 
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
     def jump(self):                        # Este método aplica a forca do salto no vetor y. 
 
         self.direction.y = self.jump_speed # A coordenada y da direção do jogador recebe a velocidade do salto.
+        self.jump_sfx.play()               # Reproduz o áudio.
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
