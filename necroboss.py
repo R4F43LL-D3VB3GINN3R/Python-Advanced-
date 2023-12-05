@@ -1,4 +1,4 @@
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 from enemies import Enemies 
 from support import import_folder
@@ -6,12 +6,13 @@ import pygame
 import random 
 from settings import *
 
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+class Necroboss(Enemies): # Classe Necroboss herda a Classe Enemies.
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
-class Necroboss(Enemies):     
-    def __init__(self, pos):  # Este é o método construtor da classe Enemies, que é chamado automaticamente quando uma nova instância (objeto) da classe é criada. 
+    def __init__(self, pos):  # Este é o método construtor da classe Necroboss, que é chamado automaticamente quando uma nova instância (objeto) da classe é criada. 
                               # Ele recebe um parâmetro pos, que representa a posição inicial do inimigo.
-        #Setup do inimigo.
+        # Setup do inimigo.
         super().__init__(pos)                                   # Chama o construtor da Classe Base.
         self.import_character_assets()                          # Este método é definido dentro da classe Enemies e é responsável por carregar as animações do inimigo a partir de arquivos de imagem.
         self.frame_index = 0                                    # frame_index é o valor do index que irá percorrer dentro do dicionário de cada animacão (self.animations). 
@@ -19,35 +20,19 @@ class Necroboss(Enemies):
         self.image = self.animations['idle'][self.frame_index]  # Define o sprite como 'Idle'. 
         self.rect = self.image.get_rect(topleft = pos)          # Obtém um retângulo associado à superfície do inimigo na posicão do canto superior esquerdo.
         self.scale_factor = 3                                   # AUMENTAR O TAMANHO DO SPRITE... 
-        self.skullmovel = 25
-        self.skullmover = 25
-        self.random_value = random.randint(1, 50)
-        self.timetoattack = False
+        self.random_value = random.randint(1, 50)               # Valor randomico para guardar a possibilidade de local de teletransporte.
 
 #------------------------------------------------------#
 
-        #Movimentacão do inimigo. 
+        # Movimentacão do inimigo. 
         self.direction = pygame.math.Vector2(0,0)   # Cria um vetor bidimensional para representar a direção do inimigo no plano (x, y)
-        self.speed = 0.1                            # Recebe a Velocidade do inimigo.
-        self.gravity = 1.1                          # Recebe a forca da gravidade.
-        self.jump_speed = -14                       # Recebe a velocidade do salto.
-        self.cooldown = 0                           # Recebe o cooldown do inimigo após movimento. 
-        self.cooldown_attack = 0                    # Recebe o cooldown do ataque do inimigo.
-        self.attack_speed = 0.42                    # Recebe a velocidade de ataque. 
 
 #------------------------------------------------------#
 
         #Status do inimigo. 
-        self.status = 'idle'      # Define o status default do inimigo como idle. 
-        self.facing_right = True  # Define o status defaut do inimigo como virado para o lado direit
+        self.status = 'idle' # Define o status default do inimigo como idle. 
 
-        self.on_ground = False    # Define o status de tocar no chão. 
-        self.on_ceiling = False   # Define o status de estar no ar. 
-        self.on_left = False      # Define o status de estar do lado esquerdo. 
-        self.on_right = False     # Define o status de estar do lado direito.
-                                  # Estas verificacões de Status servem para alinhar o sprite ao solo devidamente. 
-
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # Para animar o inimigo é preciso saber o status do inimigo.
 # Se ele estiver: pulando, correndo, caindo, parado, tocando a parede (para cada direcão)e etc... 
@@ -59,7 +44,7 @@ class Necroboss(Enemies):
     def import_character_assets(self):                                               # O método import_character_assets é responsável por carregar as animações do inimigo a partir de arquivos de imagem.
 
         character_path = './graphics/enemies/necromancer/'                           # Define o caminho para a pasta que contém os recursos gráficos do personagem
-        self.animations = {'idle':[]}                                                # Um dicionário que será preenchido com listas de imagens para diferentes animações do inimigo.
+        self.animations = {'idle':[], 'hurt':[], 'teleport':[]}                                                # Um dicionário que será preenchido com listas de imagens para diferentes animações do inimigo.
 
         for animation in self.animations.keys():                                     # Itera sobre as chaves do dicionário (os estados de animação).
             full_path = character_path + animation                                   # Concatena o caminho do personagem (character_path) com o estado atual de animação (animation)
@@ -86,27 +71,30 @@ class Necroboss(Enemies):
             # Enquanto o False é referente ao Y... 
             # Significando que ele apenas vai virar da esquerda para direita.
 
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
-    def special_moves(self):
+    def special_moves(self): # Este método guarda os métodos de ataques especiais do boss.
 
-        def teleport():
-            timetoattack = False
-            new_x = random.randint(0, screen_width - self.rect.width)  
-            new_y = random.randint(0, screen_height - self.rect.height)
-            self.rect.topleft = (new_x, new_y)
+        def teleport(): # Método de teletransporte.
+ 
+            new_x = random.randint(0, screen_width - self.rect.width)  # Recebe o valor aleatório da linha.
+            new_y = random.randint(0, 250)                             # Recebe o valor aleatório da altura.
+            self.rect.topleft = (new_x, new_y)                         # O retângulo recebe a nova posicão.                                                   
 
-        if self.random_value > 5:
-            for _ in range(5):
-                teleport()
-        
+        if self.random_value > 1:  # Se o valor randômico for maior do que um...
+            for _ in range(1):     # Itera 5 vezes na variável qualquer.
+                teleport()         # Reproduz o teletransporte.
 
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
-    def update(self):                                  # Este método é responsável por atualizar o inimigo nos eventos.
+    def get_status(self, status):  # Este método é responsável por verificar a condicão do jogador. 
+                                                
+        self.status = status # Recebe a condicão do jogador.
 
-        self.animate()                                 # Chama o Método animate da própria Classe.
-        self.get_status()                              # Chama o Método get_status da própria Classe.
-        # Desenhe o retângulo na tela
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    def update(self): # Este método é responsável por atualizar o inimigo nos eventos.
+
+        self.animate()                                 
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
