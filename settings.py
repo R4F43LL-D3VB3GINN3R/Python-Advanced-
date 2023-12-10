@@ -23,7 +23,7 @@ level_map2 = [
 '                   ', # string 6
 '                   ', # string 7
 '                   ', # string 8
-'P     H    H       ', # string 9
+'P   H  H           ', # string 9
 'XXXXXXXXXXXXXXXXX X'] # string 10
 
 level_map3 = [
@@ -40,17 +40,17 @@ level_map3 = [
 'XXXXXXXXXXXXXXXXX X'] # string 10
 
 level_map4 = [
-'                   ', # string 0
-'    S   S  S  S B  ', # string 1
-'                   ', # string 2
-'      S  S  S  S   ', # string 3
-'                   ', # string 4
-'    S     S    S   ', # string 5
-'                   ', # string 6
-'    XXXXXXXXX      ', # string 7
-'   XX              ', # string 8
-'P XXX              ', # string 9
-'XXXXXXXXXXXXXXXXX X'] # string 10
+'                   S', # string 0
+'                B   ', # string 1
+'                    ', # string 2
+'                    ', # string 3
+'                    ', # string 4
+'                    ', # string 5
+'                    ', # string 6
+'                    ', # string 7
+'                    ', # string 8
+'P                 K ', # string 9
+'XXXXXXXXXXXXXXXXXXX '] # string 10
 
 level_map5 = [
 '                    S', # string 0
