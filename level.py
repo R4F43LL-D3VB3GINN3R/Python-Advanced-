@@ -8,6 +8,7 @@ from player import Player
 from enemies import Enemies
 from necroboss import Necroboss
 from hellhound import Hellhound
+from bodyguard import Bodyguard
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 # Classe 'Level'
@@ -73,18 +74,21 @@ class Level:
 #----------------------------------------------------------#
 
         # Ferramentas.
-        self.health = 100                            # Valor default da barra de HP do jogador.
-        self.healthboss = 100                        # Valor default da barra de HP do chefe. 
-        self.x = 10                                  # Coordenada x (horizontal) onde a barra de saúde será desenhada na tela. 
-        self.y = 10                                  # Coordenada y (vertical) onde a barra de saúde será desenhada na tela. 
-        self.hurt_timer = 0                          # Recebe o tempo de tempo em que muda o comportamento para machucado.
-        self.splashspeed = 10                        # Velocidade dos projéteis atirados pelo chefe.
-        self.random_width = random.randint(1, 604)   # Altura randômica dos projéteis atirados pelo chefe.
-        self.count_taunt = 0                         # Contador de provocacões do boss que referencia qual arquivo de áudio será usado.
-        self.timer = 100                             # Um timer para cronometrar de quanto tempo o comportamento do boss muda.
-        self.timer_teleport = 200                    # Um timer para cronometrar de quanto em quanto tempo o chefe teleporta estando ele sem ser atacado.
-        self.current_x = 0                           # Recebe a posicão horizontal atual. 
-        self.game_state = "running"                  # Boleana para ajudar em transicões de tela.
+        self.health = 100                               # Valor default da barra de HP do jogador.
+        self.healthboss = 100                           # Valor default da barra de HP do chefe. 
+        self.healthknight = 100                         # Valor default da barra de HP do knight. 
+        self.x = 10                                     # Coordenada x (horizontal) onde a barra de saúde será desenhada na tela. 
+        self.y = 10                                     # Coordenada y (vertical) onde a barra de saúde será desenhada na tela. 
+        self.hurt_timer = 0                             # Recebe o tempo de tempo em que muda o comportamento para machucado.
+        self.splashspeed = 10                           # Velocidade dos projéteis atirados pelo chefe.
+        self.random_width = random.randint(1, 604)      # Altura randômica dos projéteis atirados pelo chefe.
+        self.count_taunt = 0                            # Contador de provocacões do boss que referencia qual arquivo de áudio será usado.
+        self.timer = 100                                # Um timer para cronometrar de quanto tempo o comportamento do boss muda.
+        self.timer_teleport = 200                       # Um timer para cronometrar de quanto em quanto tempo o chefe teleporta estando ele sem ser atacado.
+        self.current_x = 0                              # Recebe a posicão horizontal atual. 
+        self.game_state = "running"                     # Boleana para ajudar em transicões de tela.
+        self.status_bodyguard = random.randint(1, 4)    # Variável randoômica para alteracões de comportamento.
+        self.timerknight = 100
 
 #----------------------------------------------------------#
 
@@ -113,16 +117,17 @@ class Level:
                                     # layout é a representacão do layout da Fase que está em settings.py. 
                                     # Todo o layout será entregue como argumento para a classe principal.
 
-        self.tiles = pygame.sprite.Group()              # Um grupo de sprites chamado tiles é criado para armazenar os Blocos que serão criados.
-        self.player = pygame.sprite.GroupSingle()       # Um grupo de sprites chamado player é criado para armazenar o personagem que será criado.
-        self.enemies = pygame.sprite.Group()            # Um grupo de sprites chamado enemies é criado para armazenar o inimigo que será criado.
-        self.necroboss = pygame.sprite.GroupSingle()    # Um grupo de sprites chamado necroboss é criado para armazenar o personagem que será criado.
-        self.hellhound = pygame.sprite.Group()          # Um grupo de sprites chamado hellhound é criado para armazenar os Blocos que serão criados.
+        self.tiles = pygame.sprite.Group()            # Um grupo de sprites chamado tiles é criado para armazenar os Blocos que serão criados.
+        self.player = pygame.sprite.GroupSingle()     # Um grupo de sprites chamado player é criado para armazenar o personagem que será criado.
+        self.enemies = pygame.sprite.Group()          # Um grupo de sprites chamado enemies é criado para armazenar o inimigo que será criado.
+        self.necroboss = pygame.sprite.GroupSingle()  # Um grupo de sprites chamado necroboss é criado para armazenar o personagem que será criado.
+        self.hellhound = pygame.sprite.Group()        # Um grupo de sprites chamado hellhound é criado para armazenar os cachorros que serão criados.
+        self.bodyguard = pygame.sprite.GroupSingle()  # Um grupo de sprites chamado bodyguard é criado para armazenar os bodyguard que serão criados.
 
-        for row_index, row in enumerate(layout):   # Um loop aninhado percorre cada célula no layout usando enumerate...
-            for col_index, cell in enumerate(row): # ...para obter tanto os índices quanto os valores.
-                x = col_index * tile_size          # x Recebe o index das colunas. 
-                y = row_index * tile_size          # y Recebe o index das linhas.
+        for row_index, row in enumerate(layout):    # Um loop aninhado percorre cada célula no layout usando enumerate...
+            for col_index, cell in enumerate(row):  # ...para obter tanto os índices quanto os valores.
+                x = col_index * tile_size           # x Recebe o index das colunas. 
+                y = row_index * tile_size           # y Recebe o index das linhas.
 
                 if cell == 'X':                               # Se ao percorrer o layout for encontrado um X...
                     tile = Tile((x, y), tile_size)            # Cria uma instância do Bloco (tile), com a posicão x e y.
@@ -136,9 +141,12 @@ class Level:
                 if cell == 'B':                               # Se ao percorrer o layout for encontrado um B...
                     necroboss_sprite = Necroboss((x, y))      # Cria uma instância do Chefe, com a posicão x e y.
                     self.necroboss.add(necroboss_sprite)      # Esse bloco é adicionado ao grupo de sprites necrboss.
-                if cell == 'H':
-                    hellhound_sprite = Hellhound((x, y))
-                    self.hellhound.add(hellhound_sprite)
+                if cell == 'H':                               # Se ao percorrer o layout for encontrado um H...
+                    hellhound_sprite = Hellhound((x, y))      # Cria uma instância do Hellhound, com a posicão x e y.
+                    self.hellhound.add(hellhound_sprite)      # Esse bloco é adicionado ao grupo de sprites helldound.
+                if cell == 'K':                               # Se ao percorrer o layout for encontrado um K...
+                    bodyguard_sprite = Bodyguard((x, y))      # Cria uma instância do Bodyguard, com a posicão x e y.
+                    self.bodyguard.add(bodyguard_sprite)      # Esse bloco é adicionado ao grupo de sprites bodyguard.
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
@@ -161,9 +169,10 @@ class Level:
                                                                # Multiplicá-lo por qualquer número aumenta a velocidade. 
         hellhound_sprite = self.hellhound.sprites()            # Corrigindo a variável hellhound_sprite.
 
-        if hellhound_sprite:                 # Verifica se o sprite do hellhound existe.
-            hellhound = hellhound_sprite[0]  # Corrigindo o acesso ao sprite do hellhound.
-            hellhound.rect.x += hellhound.direction.x * hellhound.speed
+        if hellhound_sprite:                                             # Verifica se o sprite do hellhound existe.
+            hellhound = hellhound_sprite[0]                              # Corrigindo o acesso ao sprite do hellhound.
+            hellhound.rect.x += hellhound.direction.x * hellhound.speed  # Atualiza a posicão horizontal dos retângulos dos inimigos incrementando-os. 
+                                                                         # Multiplicá-lo por qualquer número aumenta a velocidade. 
 
         necroboss_sprite = self.necroboss.sprite # O chefe recebe o seu sprite.
 
@@ -221,7 +230,7 @@ class Level:
 
         # Hellhounds.
         for hound in hellhound_sprite:                       # Itera sobre todos os sprites de inimigos no grupo de enemies.
-            hound.rect.x += hound.direction.x * hound.speed  # Atualiza a posição horizontal (x) de um inimigo no seu jogo.
+              # Atualiza a posição horizontal (x) de um inimigo no seu jogo.
 
             if player.rect.colliderect(hound.rect):      # Se o retângulo do jogador colidir com o do hellhound.
                 if player.direction.x < 0:               # Se o jogador estiver indo para a direita.
@@ -259,6 +268,93 @@ class Level:
 
                 if self.health <= 0:                     # Se a barra de pontos de vida chegar a zero...
                     self.gameover()                      # O método de saída do jogo é ativado...
+
+#----------------------------------------------------------#
+
+        # Jogador vs Knight.     
+
+        for knight in self.bodyguard.sprites():
+
+            if self.status_bodyguard == 1:                                       # Se o status do knight for 1...
+                knight.status = 'idle'                                           # Modifica o status do knight para idle.
+                knight.facing_right = player.rect.centerx > knight.rect.centerx  # Ajusta direcão do cavaleiro baseado na posicão do jogador.
+            elif self.status_bodyguard == 2:                                     # Se o status do knight for 2...
+                knight.status = 'attack1'                                        # Modifica o status do knight para attack1.
+                knight.facing_right = player.rect.centerx > knight.rect.centerx  # Ajusta direcão do cavaleiro baseado na posicão do jogador.
+                if player.rect.centerx > knight.rect.centerx:                    # Se o jogador está a direita do cavaleiro...
+                    knight.rect.right += 2                                       # O ataque se dirige a esquerda.
+                    knight.facing_right = False                                  # Vira o cavaleiro para a esquerda.
+                    player.blow = False                                          # Os ataques do jogador não funcionam.
+                else:                                                            # Se o jogador está a esquerda do cavaleiro...
+                    knight.rect.right -= 2                                       # O ataque se dirige a direita.
+                    knight.facing_right = True                                   # Vira o cavaleiroa para direita.
+            elif self.status_bodyguard == 3:                                     # Se o status do knight for 3...
+                knight.status = 'attack2'                                        # Modifica o status do knight para attack2.
+                knight.facing_right = player.rect.centerx > knight.rect.centerx  # Ajusta direcão do cavaleiro baseado na posicão do jogador.
+                if player.rect.centerx > knight.rect.centerx:                    # Se o jogador está a direita do cavaleiro...
+                    knight.rect.right += 3                                       # O ataque se dirige a esquerda.
+                    knight.facing_right = False                                  # Vira o cavaleiro para a esquerda.
+                    player.blow = False                                          # Os ataques do jogador não funcionam.
+                else:                                                            # Se o jogador está a esquerda do cavaleiro...
+                    knight.rect.right -= 3                                       # O ataque se dirige a direita.
+                    knight.facing_right = True                                   # Vira o cavaleiroa para direita.
+            elif self.status_bodyguard == 4:                                     # Se o status do knight for 4...                                                     
+                knight.status = 'defend'                                         # Modifica o status do knight para defend.
+                player.blow = False                                              # Os ataques do jogador não funcionam.
+
+            if knight.rect.left < 0:                # Se o retângulo esquerdo do knight ultrapassar a tela...
+                knight.rect.left = 0                # A posicão dele receberá 0.
+            elif knight.rect.right > screen_width:  # Se o retângulo esquerdo do knight ultrapassar a tela do lado direito...
+                knight.rect.right = screen_width    # # A posicão dele receberá o limite do lado direito.
+
+            if player.rect.colliderect(knight.rect):      # Se o retângulo do jogador colidir com o do cavaleiro.
+                if player.direction.x < 0:                # Se o jogador estiver indo para a esquerda.
+                    player.rect.left = knight.rect.right  # O retângulo do jogador recebe o valor do retângulo direito do cavaleiro.
+                    player.on_left = True                 # O jogador estará indo para a esquerda.
+                    self.current_x = player.rect.left     # A posição atual do jogador em x é atualizada para a borda esquerda do retângulo do jogador.
+                    if player.blow == True:               # Se o jogador estiver golpeando...
+                        self.healthknight -= 3            # Remove o cavaleiro do grupo de sprites.
+                        knight.status = 'hurt'            # O status do cavaleiro muda.
+                        player.blow = False               # Redefine a flag de ataque.
+                    else:                                 # Se o jogador não estiver golpeando...
+                        player.status = 'hurt'            # O jogador recebe o status de machucado.
+                        self.hurt_sfx.play()              # Reproduz o áudio.
+                        self.health -= 0.8                # Deduz da saúde do jogador.
+                elif player.direction.x > 0:              # Se o jogador estiver indo para a direita.
+                    player.rect.right = knight.rect.left  # Se o jogador estiver indo para a direita, o retângulo do jogador recebe o valor do retângulo esquerdo do cavaleiro.
+                    player.on_right = True                # O jogador estará indo para a direita.
+                    self.current_x = player.rect.right    # A posição atual do jogador em x é atualizada para a borda direita do retângulo do jogador.
+                    if player.blow == True:               # Se o jogador estiver golpeando...
+                        self.healthknight -= 3            # Remove o cavaleiro do grupo de sprites.
+                        knight.status = 'hurt'            # O status do cavaleiro muda.
+                        player.blow = False               # Redefine a flag de ataque.
+                    else:                                 # Se o jogador não estiver golpeando...
+                        player.status = 'hurt'            # O jogador recebe o status de machucado.
+                        self.hurt_sfx.play()              # Reproduz o áudio.
+                        self.health -= 0.8                # Deduz da saúde do jogador.
+
+                if player.status == 'hurt':               # Se o jogador estiver machucado...
+                    if player.direction.x < 0:            # E estiver indo para a esquerda...
+                        player.rect.x += 20               # Ele é afastado para a direita.
+                    elif player.direction.x > 0:          # E se estiver indo para a direita...
+                        player.rect.x -= 20               # Ele é afastado para a esquerda.
+
+                if knight.status == 'hurt':               # Se o jogador estiver machucado...
+                    if knight.direction.x < 0:            # E estiver indo para a esquerda...
+                        knight.rect.x += 20               # Ele é afastado para a direita.
+                    elif knight.direction.x > 0:          # E se estiver indo para a direita...
+                        knight.rect.x -= 20               # Ele é afastado para a esquerda.
+
+                if self.healthknight <= 0:                # Se o pv do knight chegar a zero...
+                    self.bodyguard.remove(knight)         # Remove o sprite do knight.
+
+            
+
+        self.timerknight -= 1 # Decrementa o timer do knight.
+
+        if self.timerknight == 0:                         # Se o timer do knight chegar a zero.
+            self.status_bodyguard = random.randint(1, 4)  # Redefine a variável random.
+            self.timerknight = 50                         # Reseta o timer do knight.
 
 #----------------------------------------------------------#
 
@@ -475,6 +571,7 @@ class Level:
 
         # Gravidade aos Inimigos. 
 
+        # Esqueletos.
         for enemy in self.enemies.sprites():                      # Itera sobre todos os sprites de inimigos no grupo de enemies.
             enemy.apply_gravity()                                 # Aplica a gravidade aos inimigos.
 
@@ -491,6 +588,7 @@ class Level:
                     else:                                         # Do contrário... 
                         enemy.on_ground = False                   # Ele não estará tocando no chão. 
 
+        # Hellhounds.
         for hellhound in self.hellhound.sprites():
             hellhound.apply_gravity()
 
@@ -506,6 +604,32 @@ class Level:
                         hellhound.on_ground = True                # O inimigo está tocando no chão.
                     else:                                         # Do contrário... 
                         hellhound.on_ground = False               # Ele não estará tocando no chão.
+
+        # Knight.
+
+        bodyguard = self.bodyguard.sprite  # Variável recebe o sprite do knight.
+
+        if bodyguard is not None:      # Se houver sprite presente na tela...
+            bodyguard.apply_gravity()  # Aplica o método de gravidade.
+
+            for sprite in self.tiles.sprites():                  # Itera sobre todos os sprites de blocos no grupo de tiles.
+                if sprite.rect.colliderect(bodyguard.rect):      # Se houver uma colisão entre o Jogador e um Bloco...
+                    if bodyguard.direction.y > 0:                # Se o jogador estiver se movendo para baixo...
+                        bodyguard.rect.bottom = sprite.rect.top  # Ajusta a posição do jogador para a parte superior do bloco.
+                        bodyguard.direction.y = 0                # O jogador não está nem se movendo para cima e nem para baixo. 
+                        bodyguard.on_ground = True               # O jogador está tocando no chão. 
+                    elif player.direction.y < 0:                 # Se o jogador estiver se movendo para cima...
+                        bodyguard.hurt_sfx.play()
+                        bodyguard.rect.top = sprite.rect.bottom  # Ajusta a posição do jogador para a parte inferior do bloco.
+                        bodyguard.direction.y = 0                # O jogador não está nem se movendo para cima e nem para baixo. 
+                        bodyguard.on_ground = True               # O jogador está tocando no chão. 
+                    else:                                        # Do contrário... 
+                        bodyguard.on_ground = False              # Ele não estará tocando no chão. 
+
+            if bodyguard.on_ground and bodyguard.direction.y < 0 or bodyguard.direction.y > 1:  # Se o jogador estiver tocando no chão e estiver se movendo para cima ou estiver caindo...
+                bodyguard.on_ground = False                                                     # O jogador não está tocando no chão.
+            if bodyguard.on_ceiling and bodyguard.direction.y > 0:                              # Se o jogador estiver tocando o teto e está se movendo para baixo... 
+                bodyguard.on_ceiling = False                                                    # O jogador não está tocando no teto.
 
 #----------------------------------------------------------#
 
@@ -643,6 +767,7 @@ class Level:
             self.display_surface.blit(self.stage4, (0, 0))
             self.tiles.draw(self.display_surface)
             self.draw_health_bar(self.health, self.x, self.y, self.display_surface) # Chama o método para desenhar barra de saúde na tela. 
+            self.draw_health_bar(self.healthknight, 790, self.y, self.display_surface) # Chama o método para desenhar barra de saúde na tela.
         elif current_level == 5:
             self.display_surface.blit(self.stage5, (0, 0))
             self.tiles.draw(self.display_surface)
@@ -652,12 +777,10 @@ class Level:
 #----------------------------------------------------------#
         
         # Eventos do Jogador/Inimigos. 
-        self.player.update()       # Invoca todos os métodos da classe Player. 
-        self.enemies.update()      # Invoca todos os métodos da classe Enemies. 
-
-        
-        self.hellhound.update() 
-        self.hellhound.draw(self.display_surface)
+        self.player.update()      # Invoca todos os métodos da classe Player. 
+        self.enemies.update()     # Invoca todos os métodos da classe Enemies. 
+        self.bodyguard.update()   # Invoca todos os métodos da classe Bodyguard. 
+        self.hellhound.update()   # Invoca todos os métodos da classe Hellhound. 
 
         if len(self.necroboss) > 0:                    # Verifica se o grupo necroboss não está vazio.
             self.necroboss.update()                    # Invoca todos os métodos da classe Necroboss. 
@@ -666,8 +789,10 @@ class Level:
 #----------------------------------------------------------#
 
         # Sprites das Classes.
-        self.player.draw(self.display_surface)   # Usa o método draw do groupsingle para desenhar o personagem na superfície display_surface.
-        self.enemies.draw(self.display_surface)  # Usa o método draw do group  para desenhar o inimigo na superfície display_surface.
+        self.player.draw(self.display_surface)     # Usa o método draw do groupsingle para desenhar o personagem na superfície display_surface.
+        self.enemies.draw(self.display_surface)    # Usa o método draw do group para desenhar o inimigo na superfície display_surface.
+        self.hellhound.draw(self.display_surface)  # Usa o método draw do group para desenhar o hellhound na superfície display_surface.
+        self.bodyguard.draw(self.display_surface)  # Usa o método draw do groupsingle  para desenhar o knight na superfície display_surface.
 
 #----------------------------------------------------------#
 
@@ -683,6 +808,7 @@ class Level:
 
 #----------------------------------------------------------#
 
+        # Verificacões do Estado do Jogo.
         if self.health <= 0:              # Se o pv do jogador for menor do que zero...
             self.game_state = "gameover"  # Muda o estado do jogo para game over.
 
