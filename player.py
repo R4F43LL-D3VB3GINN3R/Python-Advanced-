@@ -45,7 +45,7 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2(0,0)  # Cria um vetor bidimensional para representar a direção do jogador no plano (x, y)
         self.speed = 3                             # Recebe a Velocidade do Jogador.
         self.gravity = 0.7                         # Recebe a forca da gravidade.
-        self.jump_speed = -20                      # Recebe a velocidade do salto.
+        self.jump_speed = -22                      # Recebe a velocidade do salto.
         self.cooldown = 0                          # Recebe o cooldown do jogador após movimento. 
         self.cooldown_attack = 0                   # Recebe o cooldown do ataque do jogador.
         self.attack_speed = 0.42                   # Recebe a velocidade de ataque. 
@@ -183,17 +183,17 @@ class Player(pygame.sprite.Sprite):
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
-    def jump(self):                        # Este método aplica a forca do salto no vetor y. 
+    def jump(self):                         # Este método aplica a forca do salto no vetor y. 
 
-        self.direction.y = self.jump_speed # A coordenada y da direção do jogador recebe a velocidade do salto.
-        self.jump_sfx.play()               # Reproduz o áudio.
+        self.direction.y = self.jump_speed  # A coordenada y da direção do jogador recebe a velocidade do salto.
+        self.jump_sfx.play()                # Reproduz o áudio.
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
-    def update(self):                                  # Este método é responsável por atualizar o jogador nos eventos.
+    def update(self): # Este método é responsável por atualizar o jogador nos eventos.
 
-        self.get_input()                               # Chama o Método get_input da própria Classe...
-        self.animate()                                 # Chama o Método animate da própria Classe.
-        self.get_status()                              # Chama o Método get_status da própria Classe.
+        self.get_input()  # Chama o Método get_input da própria Classe...
+        self.animate()    # Chama o Método animate da própria Classe.
+        self.get_status() # Chama o Método get_status da própria Classe.
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
