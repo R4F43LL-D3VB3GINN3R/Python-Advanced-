@@ -6,11 +6,10 @@ import sys               # Importa a Biblioteca sys.
 from settings import *   # Importa tudo em setting.py
 from level import Level  # Importa a Classe 'Level' de level.py.
 
-
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-# FERRAMENTAS;
+# FERRAMENTAS;  
 
-pygame.init()        # Inicializa o Pygame. 
+pygame.init()        # Inicializa o Pygame.
 pygame.font.init()   # Inicializa a Fonte.
 pygame.mixer.init()  # Inicializa o Áudio.
 
@@ -88,12 +87,15 @@ while True:                           # O Loop principal verifica os eventos do 
         if len(level3.enemies) == 0 or all(enemy.rect.y > screen_height for enemy in level3.enemies.sprites()) and (len(level3.hellhound) == 0 or all(hellhound.rect.y > screen_height for hellhound in level3.hellhound.sprites())): # Verifica se não há mais inimigos no nível ou se todos os inimigos estão fora da tela
             current_level = 4                                                                                                                                                                                                         # Altera o valor do level atual.
 
-    if current_level == 4:                             # Se o level atual for 4...
-        level4.run(4)                                  # Vai para o estágio4.
-        text = font.render("Viktor", True, (0, 0, 0))  # Variável recebe o texto.
-        text_rect = text.get_rect(center=(44, 25))     # Centraliza o texto na tela.
-        screen.blit(text, text_rect)                   # Escreve o texto no retângulo do texto.
-        if len(level4.enemies) == 0 or all(enemy.rect.y > screen_height for enemy in level4.enemies.sprites()):  # Verifica se não há mais inimigos no nível ou se todos os inimigos estão fora da tela: # Verifica se não há mais inimigos no nível ou se todos os inimigos estão fora da tela
+    if current_level == 4:                                     # Se o level atual for 4...
+        level4.run(4)                                          # Vai para o estágio4.
+        text = font.render("Viktor", True, (0, 0, 0))          # Variável recebe o texto.
+        text_rect = text.get_rect(center=(44, 25))             # Centraliza o texto na tela.
+        screen.blit(text, text_rect)                           # Escreve o texto no retângulo do texto.
+        text2 = font.render("Fallen Knight", True, (0, 0, 0))  # Variável recebe o texto.
+        text2_rect = text2.get_rect(center=(1100, 25))         # Centraliza o texto na tela.
+        screen.blit(text2, text2_rect)                         # Escreve o texto no retângulo do texto.   
+        if len(level4.enemies) == 0 or all(enemy.rect.y > screen_height for enemy in level4.enemies.sprites()) and (len(level4.bodyguard) == 0 or all(bodyguard.rect.y > screen_height for bodyguard in level4.bodyguard.sprites())): # Verifica se não há mais inimigos no nível ou se todos os inimigos estão fora da tela:  # Verifica se não há mais inimigos no nível ou se todos os inimigos estão fora da tela: # Verifica se não há mais inimigos no nível ou se todos os inimigos estão fora da tela
             current_level = 5                                                                                    # Altera o valor do level atual.
             taunt1.play()
 
